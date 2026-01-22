@@ -1,0 +1,58 @@
+#Prepare Data
+le = LabelEncoder()
+df["price_category_encoded"] = le.fit_transform(df["price_category"])
+
+X = df.select_dtypes(include=["number"]).drop(columns=["price_category_encoded"])
+Y = df["price_category_encoded"]
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+#Train test split 80/20
+X_train, X_test, Y_train, Y_test = train_test_split(
+    X_scaled, Y, test_size=0.20, random_state=42, stratify=Y
+)
+
+#Define Models
+models = {
+    "Logistics Regression": LogisticRegression(max_iter=500),
+    "Random Forest": RandomForestClassifier(n_estimators=200, random_state=42),
+    "SVM": SVC(kernel="rbf", probability=True)
+}
+results = {}
+
+for name, model in models.items():
+    print(f"\n=============================")
+    print(f"MODEL: {name}")
+    print("==============================")
+
+    #Train
+    model.fit(X_train, Y_train)
+
+    Y_pred = model.predict(X_test)
+
+    #Metrics
+    train_accuracy = model.score(X_train, Y_train)
+    f1 = f1_score(Y_test, Y_pred, average="weighted")
+    cm = confusion_matrix(Y_test, Y_pred)
+
+    #Count correct/incorrect predictions
+    correct = (Y_pred == Y_test).sum()
+    incorrect = (Y_pred != Y_test).sum()
+
+    #Store Results
+    results[name] = {
+        "Training Accuracy": train_accuracy,
+        "F1 Scor": f1,
+        "Confusion Matrix": cm,
+        "Correct Predictions": correct,
+        "Incorrect Predictions": incorrect
+    }
+
+    #Disply
+    print(f"Training Accuracy: {train_accuracy:.4f}")
+    print(f"F1 Score: {f1:.4f}")
+    print("Confusion Matrix:")
+    print(cm)
+    print(f"Correct Predictions: {correct}")
+    print(f"Incorrect Predictions: {incorrect}")
