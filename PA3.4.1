@@ -1,0 +1,32 @@
+# Import necessary libraries
+import pandas as pd
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score
+import matplotlib.pyplot as plt
+from datetime import datetime
+from IPython.display import display, Markdown
+import seaborn as sns
+import numpy as np
+todays_date = datetime.now().strftime("%Y-%m-%d")
+student_id = "DAMHAR2570"
+
+#Load dataset
+file_path = r"c:\Files\Excel\Predictive_PythonR\AirbnbListings_V3.xlsx"
+df = pd.read_excel(file_path)
+
+#Define bins and labels
+bins = [0, 250, 500, 1200]
+labels = ["Inexpensive", "Standard Price", "Expensive"]
+
+#Create the price category column
+df["price_category"] = pd.cut(df["price"], bins=bins, labels=labels, include_lowest=True)
+
+#Preview
+display(Markdown(f"Date: {todays_date}"))
+display(Markdown(f"Student ID: {student_id}"))
+df[["price", "price_category"]].head()
