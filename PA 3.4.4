@@ -1,0 +1,34 @@
+models = ["Logistics Regression", "Random Forest", "SVM"]
+
+correct = [
+    results["Logistics Regression"]["Correct Predictions"],
+    results["Random Forest"]["Correct Predictions"],
+    results["SVM"]["Correct Predictions"]
+]
+
+incorrect = [
+    results["Logistics Regression"]["Incorrect Predictions"],
+    results["Random Forest"]["Incorrect Predictions"],
+    results["SVM"]["Incorrect Predictions"]
+]
+
+x = np.arange(len(models))
+width = 0.35
+
+plt.figure(figsize=(10, 6))
+plt.bar(x - width/2, correct, width, label="Correct", color="seagreen")
+plt.bar(x + width/2, incorrect, width, label="Incorrect", color="firebrick")
+
+#Labels and Titles
+plt.xlabel("Model")
+plt.ylabel("Count")
+plt.title("Correct vs Incorrect Predictions by Model")
+plt.xticks(x, models)
+plt.legend()
+
+for i in range(len(models)):
+    plt.text(x[i] - width/2, correct[i] + 1, str(correct[i]), ha="center")
+    plt.text(x[i] + width/2, incorrect[i] + 1, str(incorrect[i]), ha="center")
+
+plt.tight_layout()
+plt.show()
