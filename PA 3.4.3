@@ -1,0 +1,18 @@
+models = ["Logistic Regression", "Random Forest", "SVM"]
+accuracy = [0.78, 0.92, 0.80]
+
+#Create Bar Chart
+plt.figure(figsize=(8, 5))
+plt.bar(models, accuracy, color=["steelblue", "seagreen", "darkorange"])
+
+#labels and title
+plt.ylabel("Training Accuracy")
+plt.xlabel("Model")
+plt.title("Training Accuracy by Model")
+
+#Display values on top of bars
+for i, v in enumerate(accuracy):
+    plt.text(i, v + 0.01, f"{v:.2f}", ha="center", fontsize=10)
+
+plt.ylim(0, 1)
+plt.show()
