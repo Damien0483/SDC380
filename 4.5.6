@@ -1,0 +1,56 @@
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+
+# Load dataset
+df = pd.read_excel("AirbnbListings_v4.xlsx")
+
+# Select features and target
+features = ["minimum_nights", "number_of_reviews", "availability_365"]
+target = "price"
+
+X = df[features]
+y = df[target]
+
+# Train/test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Train Random Forest model
+rf = RandomForestRegressor(n_estimators=500, random_state=42)
+rf.fit(X_train, y_train)
+
+# -------------------------------------------------------
+# GRID SEARCH FOR OPTIMAL FEATURE VALUES
+# -------------------------------------------------------
+
+# Create search ranges
+min_range = np.linspace(df["minimum_nights"].min(), df["minimum_nights"].max(), 50)
+reviews_range = np.linspace(df["number_of_reviews"].min(), df["number_of_reviews"].max(), 50)
+avail_range = np.linspace(df["availability_365"].min(), df["availability_365"].max(), 50)
+
+best_price = -np.inf
+best_combo = None
+
+for mn in min_range:
+    for rv in reviews_range:
+        for av in avail_range:
+            row = pd.DataFrame([[mn, rv, av]], columns=features)
+            pred = rf.predict(row)[0]
+
+            if pred > best_price:
+                best_price = pred
+                best_combo = (mn, rv, av)
+
+# -------------------------------------------------------
+# DISPLAY RESULTS
+# -------------------------------------------------------
+
+print("Optimal Feature Values:")
+print(f"  minimum_nights     = {best_combo[0]:.2f}")
+print(f"  number_of_reviews  = {best_combo[1]:.2f}")
+print(f"  availability_365   = {best_combo[2]:.2f}")
+
+print(f"\nOptimal Predicted Price = ${best_price:,.2f}")
