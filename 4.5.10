@@ -1,0 +1,58 @@
+# Install packages if needed
+# install.packages("readxl")
+# install.packages("randomForest")
+
+library(readxl)
+library(randomForest)
+
+# Load dataset using your required path
+df <- read_excel("c:/Files/Excel/Prescriptive_PythonR/AirbnbListings_v4.xlsx")
+
+# Select features and target
+features <- c("minimum_nights", "number_of_reviews", "availability_365")
+target <- "price"
+
+X <- df[features]
+y <- df[[target]]
+
+# Train Random Forest model
+set.seed(42)
+rf_model <- randomForest(x = X, y = y, ntree = 500)
+
+# -------------------------------------------------------
+# DEFINE THE SIX SCENARIOS
+# -------------------------------------------------------
+
+# For scenarios missing one feature, fill with dataset mean
+mean_min_nights <- mean(df$minimum_nights)
+mean_reviews <- mean(df$number_of_reviews)
+mean_avail <- mean(df$availability_365)
+
+scenarios <- data.frame(
+  minimum_nights = c(7, 1, 2, 14, mean_min_nights, mean_min_nights),
+  number_of_reviews = c(100, 10, mean_reviews, mean_reviews, 5, 200),
+  availability_365 = c(mean_avail, mean_avail, 100, 300, 300, 100)
+)
+
+# Predict prices for each scenario
+scenario_predictions <- predict(rf_model, scenarios)
+
+# Add predictions to table
+scenarios$predicted_price <- scenario_predictions
+
+# -------------------------------------------------------
+# DISPLAY RESULTS
+# -------------------------------------------------------
+
+cat("=== Scenario Evaluation Results ===\n\n")
+
+for (i in 1:nrow(scenarios)) {
+  cat(paste0("Scenario ", i, ":\n"))
+  cat("  minimum_nights     = ", round(scenarios$minimum_nights[i], 2), "\n")
+  cat("  number_of_reviews  = ", round(scenarios$number_of_reviews[i], 2), "\n")
+  cat("  availability_365   = ", round(scenarios$availability_365[i], 2), "\n")
+  cat("  Predicted Price    = $", round(scenarios$predicted_price[i], 2), "\n\n")
+}
+
+# Optional: print full table
+scenarios
