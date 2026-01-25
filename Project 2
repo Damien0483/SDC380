@@ -1,0 +1,10 @@
+import pandas as pd
+
+# File path
+file_path = r"c:\Files\Excel\Project\Stroke_Prediction_Dataset.xlsx"
+
+# Load the dataset
+df = pd.read_excel(file_path)
+
+# Preview the first few rows
+df.head()
