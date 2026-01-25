@@ -1,0 +1,7 @@
+import pandas as pd
+# File path
+file_path = r"C:\Files\Excel\Project\Stroke_Prediction_Dataset.xlsx"
+# Load dataset
+df = pd.read_excel(file_path, engine="openpyxl")
+# Preview the data
+df.head()
