@@ -1,0 +1,50 @@
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+
+# Load dataset
+df = pd.read_excel("AirbnbListings_v4.xlsx")
+
+# Select features and target
+features = ["minimum_nights", "number_of_reviews", "availability_365"]
+target = "price"
+
+X = df[features]
+y = df[target]
+
+# Train/test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Train Random Forest model
+rf = RandomForestRegressor(n_estimators=500, random_state=42)
+rf.fit(X_train, y_train)
+
+# -----------------------------------------
+# DEFINE THE SIX SCENARIOS
+# -----------------------------------------
+
+scenarios = pd.DataFrame([
+    {"minimum_nights": 7,  "number_of_reviews": 100, "availability_365": X["availability_365"].mean()},
+    {"minimum_nights": 1,  "number_of_reviews": 10,  "availability_365": X["availability_365"].mean()},
+    {"minimum_nights": 2,  "number_of_reviews": X["number_of_reviews"].mean(), "availability_365": 100},
+    {"minimum_nights": 14, "number_of_reviews": X["number_of_reviews"].mean(), "availability_365": 300},
+    {"minimum_nights": X["minimum_nights"].mean(), "number_of_reviews": 5,   "availability_365": 300},
+    {"minimum_nights": X["minimum_nights"].mean(), "number_of_reviews": 200, "availability_365": 100}
+])
+
+# Predict prices for each scenario
+predictions = rf.predict(scenarios)
+
+# Add predictions to the scenario table
+scenarios["predicted_price"] = predictions
+
+# Display results
+print("=== Scenario Evaluation Results ===\n")
+for i, row in scenarios.iterrows():
+    print(f"Scenario {i+1}:")
+    print(f"  minimum_nights     = {row['minimum_nights']}")
+    print(f"  number_of_reviews  = {row['number_of_reviews']}")
+    print(f"  availability_365   = {row['availability_365']}")
+    print(f"  Predicted Price    = ${row['predicted_price']:.2f}\n")
