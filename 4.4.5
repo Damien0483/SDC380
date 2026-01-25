@@ -1,0 +1,56 @@
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+
+# Load dataset
+df = pd.read_excel("AirbnbListings_v4.xlsx")
+
+# Select features and target
+features = ["minimum_nights", "number_of_reviews", "availability_365"]
+target = "price"
+
+X = df[features]
+y = df[target]
+
+# Train/test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Train Random Forest model
+rf = RandomForestRegressor(n_estimators=500, random_state=42)
+rf.fit(X_train, y_train)
+
+# -----------------------------
+# WHAT-IF ANALYSIS (+14 nights)
+# -----------------------------
+
+# Create a modified copy of X
+X_adjusted = X.copy()
+X_adjusted["minimum_nights"] = X_adjusted["minimum_nights"] + 14
+
+# Predict original and adjusted prices
+original_pred = rf.predict(X)
+adjusted_pred = rf.predict(X_adjusted)
+
+# Add results to dataframe
+df["predicted_price_original"] = original_pred
+df["predicted_price_adjusted"] = adjusted_pred
+df["price_change_due_to_minimum_nights_plus_14"] = (
+    df["predicted_price_adjusted"] - df["predicted_price_original"]
+)
+
+# Display summary
+print("=== WHAT-IF ANALYSIS: Increase minimum_nights by 14 ===")
+print(f"Average predicted price (original): ${df['predicted_price_original'].mean():.2f}")
+print(f"Average predicted price (adjusted): ${df['predicted_price_adjusted'].mean():.2f}")
+print(f"Average price impact: ${df['price_change_due_to_minimum_nights_plus_14'].mean():.2f}")
+
+# Show first few rows of the what-if results
+print("\nSample of What-If Results:")
+print(df[[
+    "minimum_nights",
+    "predicted_price_original",
+    "predicted_price_adjusted",
+    "price_change_due_to_minimum_nights_plus_14"
+]].head())
