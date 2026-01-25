@@ -1,0 +1,35 @@
+library(readxl)
+library(randomForest)
+library(ggplot2)
+
+# Load dataset
+df <- read_excel("AirbnbListings_v4.xlsx")
+
+# Select features and target
+features <- c("minimum_nights", "number_of_reviews", "availability_365")
+target <- "price"
+
+# Prepare data
+X <- df[features]
+y <- df[[target]]
+
+# Train Random Forest model
+set.seed(42)
+rf_model <- randomForest(x = X, y = y, ntree = 500, importance = TRUE)
+
+# Extract feature importance
+importance_df <- data.frame(
+  Feature = rownames(importance(rf_model)),
+  Importance = importance(rf_model)[, "%IncMSE"]
+)
+
+# Plot feature importance
+ggplot(importance_df, aes(x = reorder(Feature, Importance), y = Importance)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Feature Importance for Airbnb Price Prediction",
+    x = "Feature",
+    y = "% Increase in MSE (Higher = More Important)"
+  ) +
+  theme_minimal()
