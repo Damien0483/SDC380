@@ -1,0 +1,44 @@
+library(readxl)
+library(ggplot2)
+
+# Load dataset
+df <- read_excel("AirbnbListings_v4.xlsx")
+
+# -------------------------------
+# Feature Analysis: minimum_nights
+# -------------------------------
+ggplot(df, aes(x = minimum_nights, y = price)) +
+  geom_point(alpha = 0.4, color = "steelblue") +
+  geom_smooth(method = "loess", color = "darkred") +
+  labs(
+    title = "Feature Analysis: Minimum Nights vs Price",
+    x = "Minimum Nights",
+    y = "Price"
+  ) +
+  theme_minimal()
+
+# ---------------------------------
+# Feature Analysis: number_of_reviews
+# ---------------------------------
+ggplot(df, aes(x = number_of_reviews, y = price)) +
+  geom_point(alpha = 0.4, color = "forestgreen") +
+  geom_smooth(method = "loess", color = "darkred") +
+  labs(
+    title = "Feature Analysis: Number of Reviews vs Price",
+    x = "Number of Reviews",
+    y = "Price"
+  ) +
+  theme_minimal()
+
+# ---------------------------------
+# Feature Analysis: availability_365
+# ---------------------------------
+ggplot(df, aes(x = availability_365, y = price)) +
+  geom_point(alpha = 0.4, color = "purple") +
+  geom_smooth(method = "loess", color = "darkred") +
+  labs(
+    title = "Feature Analysis: Availability (365 Days) vs Price",
+    x = "Availability (Days per Year)",
+    y = "Price"
+  ) +
+  theme_minimal()
