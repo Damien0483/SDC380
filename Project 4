@@ -1,0 +1,21 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Filter only stroke patients
+stroke_only = df[df["Diagnosis"] == "Stroke"]
+
+# Scatter plot: Age vs BMI
+plt.figure(figsize=(8,5))
+sns.scatterplot(
+    data=stroke_only,
+    x="Age",
+    y="Body Mass Index (BMI)",
+    color="steelblue",
+    edgecolor="black"
+)
+
+plt.title("Age vs BMI for Stroke Patients")
+plt.xlabel("Age")
+plt.ylabel("Body Mass Index (BMI)")
+plt.tight_layout()
+plt.show()
