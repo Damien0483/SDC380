@@ -1,0 +1,52 @@
+# Install packages if needed
+# install.packages("readxl")
+# install.packages("randomForest")
+
+library(readxl)
+library(randomForest)
+
+# Load dataset using your required path
+df <- read_excel("c:/Files/Excel/Prescriptive_PythonR/AirbnbListings_v4.xlsx")
+
+# Select features and target
+features <- c("minimum_nights", "number_of_reviews", "availability_365")
+target <- "price"
+
+X <- df[features]
+y <- df[[target]]
+
+# Train Random Forest model
+set.seed(42)
+rf_model <- randomForest(x = X, y = y, ntree = 500)
+
+# -------------------------------------------------------
+# WHAT-IF ANALYSIS: Increase minimum_nights by 14
+# -------------------------------------------------------
+
+# Create adjusted dataset
+X_adjusted <- X
+X_adjusted$minimum_nights <- X_adjusted$minimum_nights + 14
+
+# Predict original and adjusted prices
+original_pred <- predict(rf_model, X)
+adjusted_pred <- predict(rf_model, X_adjusted)
+
+# Add results to dataframe
+df$predicted_price_original <- original_pred
+df$predicted_price_adjusted <- adjusted_pred
+df$price_change_min_nights_plus_14 <- adjusted_pred - original_pred
+
+# -------------------------------------------------------
+# DISPLAY SUMMARY
+# -------------------------------------------------------
+
+cat("=== WHAT-IF ANALYSIS: Increase minimum_nights by 14 ===\n")
+cat("Average predicted price (original): $", round(mean(df$predicted_price_original), 2), "\n")
+cat("Average predicted price (adjusted): $", round(mean(df$predicted_price_adjusted), 2), "\n")
+cat("Average price impact: $", round(mean(df$price_change_min_nights_plus_14), 2), "\n\n")
+
+# Show sample rows
+head(df[, c("minimum_nights",
+            "predicted_price_original",
+            "predicted_price_adjusted",
+            "price_change_min_nights_plus_14")])
