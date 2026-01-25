@@ -1,0 +1,49 @@
+library(readxl)
+library(randomForest)
+
+# Load dataset
+df <- read_excel("AirbnbListings_v4.xlsx")
+
+# Select features and target
+features <- c("minimum_nights", "number_of_reviews", "availability_365")
+target <- "price"
+
+X <- df[features]
+y <- df[[target]]
+
+# Train Random Forest model
+set.seed(42)
+rf_model <- randomForest(x = X, y = y, ntree = 500)
+
+# -------------------------------------------------------
+# FAST GRID SEARCH (Vectorized)
+# -------------------------------------------------------
+
+# Create search ranges
+min_range <- seq(min(df$minimum_nights), max(df$minimum_nights), length.out = 50)
+reviews_range <- seq(min(df$number_of_reviews), max(df$number_of_reviews), length.out = 50)
+avail_range <- seq(min(df$availability_365), max(df$availability_365), length.out = 50)
+
+# Build full grid of all combinations (125,000 rows)
+grid <- expand.grid(
+  minimum_nights = min_range,
+  number_of_reviews = reviews_range,
+  availability_365 = avail_range
+)
+
+# Predict all prices at once (MUCH faster)
+grid$predicted_price <- predict(rf_model, grid)
+
+# Find the best row
+best_row <- grid[which.max(grid$predicted_price), ]
+
+# -------------------------------------------------------
+# DISPLAY RESULTS
+# -------------------------------------------------------
+
+cat("Optimal Feature Values:\n")
+cat("  minimum_nights     =", round(best_row$minimum_nights, 2), "\n")
+cat("  number_of_reviews  =", round(best_row$number_of_reviews, 2), "\n")
+cat("  availability_365   =", round(best_row$availability_365, 2), "\n\n")
+
+cat("Optimal Predicted Price = $", round(best_row$predicted_price, 2), "\n")
