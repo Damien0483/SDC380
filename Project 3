@@ -1,0 +1,18 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Filter only patients diagnosed with a stroke
+stroke_only = df[df["Diagnosis"] == "Stroke"]
+
+# Count work types
+work_counts = stroke_only["Work Type"].value_counts()
+
+# Plot
+plt.figure(figsize=(8,5))
+sns.barplot(x=work_counts.index, y=work_counts.values, palette="Blues_d")
+plt.title("Work Type Distribution Among Stroke Patients")
+plt.xlabel("Work Type")
+plt.ylabel("Count")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
