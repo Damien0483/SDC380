@@ -1,0 +1,15 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Select the numerical columns
+num_cols = ["Age", "Body Mass Index (BMI)", "Average Glucose Level"]
+
+# Compute correlation matrix
+corr_matrix = df[num_cols].corr()
+
+# Plot heatmap
+plt.figure(figsize=(6,4))
+sns.heatmap(corr_matrix, annot=True, cmap="Blues", linewidths=0.5)
+plt.title("Correlation Heatmap: Age, BMI, and Average Glucose Level")
+plt.tight_layout()
+plt.show()
