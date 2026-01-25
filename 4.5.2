@@ -1,0 +1,28 @@
+# Install packages if needed
+# install.packages("readxl")
+# install.packages("randomForest")
+
+library(readxl)
+library(randomForest)
+
+# Load dataset
+df <- read_excel("AirbnbListings_v4.xlsx")
+
+# Select features and target
+features <- c("minimum_nights", "number_of_reviews", "availability_365")
+target <- "price"
+
+# Prepare data
+X <- df[features]
+y <- df[[target]]
+
+# Train Random Forest model
+set.seed(42)
+rf_model <- randomForest(x = X, y = y, ntree = 500, importance = TRUE)
+
+# Display feature importance
+importance_values <- importance(rf_model)
+print(importance_values)
+
+# Optional: Plot importance
+varImpPlot(rf_model, main = "Feature Importance for Airbnb Price Prediction")
