@@ -1,56 +1,64 @@
-import pandas as pd
-import numpy as np
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
+# Install packages if needed
+# install.packages("readxl")
+# install.packages("randomForest")
+
+library(readxl)
+library(randomForest)
 
 # Load dataset
-df = pd.read_excel("AirbnbListings_v4.xlsx")
+df <- read_excel("AirbnbListings_v4.xlsx")
 
 # Select features and target
-features = ["minimum_nights", "number_of_reviews", "availability_365"]
-target = "price"
+features <- c("minimum_nights", "number_of_reviews", "availability_365")
+target <- "price"
 
-X = df[features]
-y = df[target]
-
-# Train/test split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X <- df[features]
+y <- df[[target]]
 
 # Train Random Forest model
-rf = RandomForestRegressor(n_estimators=500, random_state=42)
-rf.fit(X_train, y_train)
+set.seed(42)
+rf_model <- randomForest(x = X, y = y, ntree = 500)
 
 # -------------------------------------------------------
 # GRID SEARCH FOR OPTIMAL FEATURE VALUES
 # -------------------------------------------------------
 
-# Create search ranges
-min_range = np.linspace(df["minimum_nights"].min(), df["minimum_nights"].max(), 50)
-reviews_range = np.linspace(df["number_of_reviews"].min(), df["number_of_reviews"].max(), 50)
-avail_range = np.linspace(df["availability_365"].min(), df["availability_365"].max(), 50)
+# Create search ranges (50 points each)
+min_range <- seq(min(df$minimum_nights), max(df$minimum_nights), length.out = 50)
+reviews_range <- seq(min(df$number_of_reviews), max(df$number_of_reviews), length.out = 50)
+avail_range <- seq(min(df$availability_365), max(df$availability_365), length.out = 50)
 
-best_price = -np.inf
-best_combo = None
+best_price <- -Inf
+best_combo <- c(NA, NA, NA)
 
-for mn in min_range:
-    for rv in reviews_range:
-        for av in avail_range:
-            row = pd.DataFrame([[mn, rv, av]], columns=features)
-            pred = rf.predict(row)[0]
-
-            if pred > best_price:
-                best_price = pred
-                best_combo = (mn, rv, av)
+# Triple nested loop for grid search
+for (mn in min_range) {
+  for (rv in reviews_range) {
+    for (av in avail_range) {
+      
+      row <- data.frame(
+        minimum_nights = mn,
+        number_of_reviews = rv,
+        availability_365 = av
+      )
+      
+      pred <- predict(rf_model, row)
+      
+      if (pred > best_price) {
+        best_price <- pred
+        best_combo <- c(mn, rv, av)
+      }
+    }
+  }
+}
 
 # -------------------------------------------------------
 # DISPLAY RESULTS
 # -------------------------------------------------------
 
-print("Optimal Feature Values:")
-print(f"  minimum_nights     = {best_combo[0]:.2f}")
-print(f"  number_of_reviews  = {best_combo[1]:.2f}")
-print(f"  availability_365   = {best_combo[2]:.2f}")
+cat("Optimal Feature Values:\n")
+cat("  minimum_nights     =", round(best_combo[1], 2), "\n")
+cat("  number_of_reviews  =", round(best_combo[2], 2), "\n")
+cat("  availability_365   =", round(best_combo[3], 2), "\n\n")
 
-print(f"\nOptimal Predicted Price = ${best_price:,.2f}")
+cat("Optimal Predicted Price = $", round(best_price, 2), "\n")
